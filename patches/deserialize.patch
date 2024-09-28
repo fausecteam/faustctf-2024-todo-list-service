@@ -1,0 +1,30 @@
+commit 621cbabe71cb2e9e582e5278a1de26b1795c183f
+Author: Florian Fladerer <florian.fladerer@fau.de>
+Date:   Tue Sep 17 11:39:24 2024 +0200
+
+    patch
+
+diff --git a/service/service/Services/Serializer.cs b/service/service/Services/Serializer.cs
+index d6397a5..7c77ea7 100644
+--- a/service/service/Services/Serializer.cs
++++ b/service/service/Services/Serializer.cs
+@@ -37,12 +37,15 @@ public static class Serializer
+ 
+     public static List<T> DeserializeJson<T>(string requestBody)
+     {
+-        var res = JsonConvert.DeserializeObject<dynamic>(requestBody,
+-            new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Objects });
++        var res = JsonConvert.DeserializeObject<List<T>>(requestBody,
++            new JsonSerializerSettings
++            {
++                //TypeNameHandling = TypeNameHandling.Objects
++            });
+         if (res == null)
+             return [];
+-        List<T> t = res.ToObject<List<T>>();
+-        return t;
++        // List<T> t = res.ToObject<List<T>>();
++        return res;
+     }
+ 
+     public static List<T> DeserializeXML<T>(string requestBody)

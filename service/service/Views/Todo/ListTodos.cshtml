@@ -1,0 +1,155 @@
+﻿@using System.Reflection.Metadata
+
+@{
+    ViewData["Title"] = "Todos";
+}
+
+<div>
+    <h1 style="text-align: center">Todo List</h1>
+    @if (ViewBag.Filters != null)
+    {
+        <form class="filters" asp-action="ApplyFilter" method="GET">
+            <label for="filterDropdown">Select an option:</label>
+            <select id="filterDropdown" name="name" class="form-control margin-box">
+                <option value="">Select an option</option>
+                @foreach (var option in ViewBag.Filters)
+                {
+                <option class="filter" value="@option.Name">@option.Name</option>
+                }
+            </select>
+            <input type="submit" value="Submit" class="margin-box btn btn-primary"/>
+        </form>
+    }
+    <div>
+        <asp:Button id="openFilterModal" data-modal-id="filterModal" class="btn btn-primary margin-box">Add Filter</asp:Button>
+    </div>
+    <div id="filterModal" class="modal">
+        <div class="modal-content">
+            <div class="input-container">
+                <form id="filterForm" data-modal-id="filterModal" asp-action="AddFilter">
+                    <div class="form-group">
+                        <label for="filterName">Filter Name:</label>
+                        <input id="filterName" name="Name" class="form-control margin-box" placeholder="Name of the filter" />
+                    </div>
+                    <div class="form-group">
+                        <label for="filterCategory">Category:</label>
+                        <input id="filterCategory" name="Category" class="form-control margin-box" placeholder="Category to filter for" />
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label for="fromDate">From Date:</label>
+                            <input type="date" id="fromDate" name="FromDate" class="form-control margin-box" />
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="fromTime">From Time:</label>
+                            <input type="time" id="fromTime" name="FromTime" class="form-control margin-box" />
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label for="toDate">To Date:</label>
+                            <input type="date" id="toDate" name="ToDate" class="form-control margin-box" />
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="toTime">To Time:</label>
+                            <input type="time" id="toTime" name="ToTime" class="form-control margin-box" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Save" class="btn btn-primary margin-box" />
+                    </div>
+                </form>
+            </div>
+            <span class="close-btn">&times;</span>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.getElementById('filterForm');
+            form.addEventListener('submit', function(event) {
+                var nameField = document.getElementById('filterName');
+                var nameValue = nameField.value.trim();
+
+                // Get date and time field values
+                var fromDateField = document.getElementById('fromDate');
+                var fromDateValue = fromDateField.value;
+                var fromTimeField = document.getElementById('fromTime');
+                var fromTimeValue = fromTimeField.value;
+                var toDateField = document.getElementById('toDate');
+                var toDateValue = toDateField.value;
+                var toTimeField = document.getElementById('toTime');
+                var toTimeValue = toTimeField.value;
+
+                // Check for name field
+                if (!nameValue) {
+                    event.preventDefault();
+                    alert('Please enter a name for the filter.');
+                    nameField.focus();
+                    return;
+                }
+
+                // Check if both From Date and From Time are set or both are empty
+                if ((fromDateValue && !fromTimeValue) || (!fromDateValue && fromTimeValue)) {
+                    event.preventDefault();
+                    alert('Please enter both From Date and From Time.');
+                    fromDateField.focus();
+                    return;
+                }
+
+                // Check if both To Date and To Time are set or both are empty
+                if ((toDateValue && !toTimeValue) || (!toDateValue && toTimeValue)) {
+                    event.preventDefault();
+                    alert('Please enter both To Date and To Time.');
+                    toDateField.focus();
+                    return;
+                }
+
+                // Check if From Date is before To Date or if they are equal, From Time is before To Time
+                if (fromDateValue && toDateValue) {
+                    var fromDateTime = new Date(fromDateValue + 'T' + (fromTimeValue || '00:00'));
+                    var toDateTime = new Date(toDateValue + 'T' + (toTimeValue || '23:59'));
+
+                    if (fromDateTime > toDateTime) {
+                        event.preventDefault();
+                        alert('From Date/Time must be before To Date/Time.');
+                        fromDateField.focus();
+                        return;
+                    }
+                }
+            });
+        });
+    </script>
+<div style="width: 40%; margin: auto;" class="main-container">
+        @foreach (TodoItem item in ViewBag.TodoItems)
+        {
+            <div class="todo-item">
+                <div >
+                    <input
+                        style="float:left; margin-top: 5px"
+                        onchange="toogleCheckbox('checkbox_' + @item.Id)"
+                        type="checkbox"
+                        id="checkbox_@item.Id" @(item.IsCompleted ? "checked" : "")/>
+                </div>
+                <div class="todo-description" style="margin-left:  25px;">
+                    @item.Description
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<script>
+    function toogleCheckbox(id) {
+        var isChecked = document.getElementById(id).checked;
+        $.ajax({
+            url: '@Url.Action("UpdateCheckboxState", "Todo")',
+            type: 'POST',
+            data: {id: id.replace("checkbox_", ""), isChecked: isChecked},
+            success: function (response) {
+                console.log("Checkbox state updated successfully.");
+            },
+            error: function (xhr, status, error) {
+                console.error("An error occurred: " + error);
+            }
+        });
+    }
+</script>

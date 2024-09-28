@@ -1,0 +1,24 @@
+version: "2.2"
+# ipv6 is not supported in version 3
+
+services:
+  todo-list-service:
+    image: faust.cs.fau.de:5000/todo-list-service
+    restart: unless-stopped
+    init: true
+    build: ./service/service
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./service/service/sqlite:/app/sqlite
+
+    #environment:
+      #- ASPNETCORE_ENVIRONMENT=Development
+    
+networks:
+ default:
+   enable_ipv6: true
+   ipam:
+       driver: default
+       config:
+           - subnet: "fd42:d0ce:1234::/64"

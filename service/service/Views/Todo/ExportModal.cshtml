@@ -1,0 +1,14 @@
+<div id="exportModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Export File</h2>
+        <form id="exportForm" data-modal-id="exportModal" action="/Todo/Export" method="GET">
+            <label for="format">Choose an option:</label>
+            <select name="format" id="format">
+                <option value="json">JSON</option>
+                <option value="xml">XML</option>
+            </select>    
+            <button type="submit" class="btn btn-primary margin-box">Export</button>
+        </form>
+    </div>
+</div>

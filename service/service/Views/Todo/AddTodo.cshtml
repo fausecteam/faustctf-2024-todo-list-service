@@ -1,0 +1,23 @@
+﻿@model service.Models.TodoItem
+
+@{
+    ViewData["Title"] = "Add Todo";
+}
+
+<div class="text-center">   
+    <div class="input-container">
+        <form asp-action="AddTodo">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Description" class="control-label margin-box"></label>
+                <input asp-for="Description" class="form-control margin-box" />
+                <label asp-for="Category" class="control-label margin-box"></label>
+                <input asp-for="Category" class="form-control margin-box" />
+            </div>
+            <div class="form-group">
+                <input style="margin: 10px" type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
